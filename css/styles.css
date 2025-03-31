@@ -1,0 +1,6 @@
+:root {
+    --primary-color: #590696;
+    --secondary-color: #8c52ff;
+    --bacground: #ffedb5;
+    --gradient-bg: radial-gradient(circle, rgba(89,6,150,1) 21%, rgba(140,82,255,1) 76%);
+}
