@@ -31,9 +31,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $newId = $prefix . sprintf("%05d", $number); // Format as HT-ML00200
 
+    // Fetch latest batch details
+    $batchQuery = "SELECT batch_no, start_date, end_date FROM batch ORDER BY batch_no DESC LIMIT 1";
+    $batchResult = $conn->query($batchQuery);
+
+    if ($batchResult->num_rows > 0) {
+        $batchRow = $batchResult->fetch_assoc();
+        $batch_no = $batchRow['batch_no'];
+        $start_date = $batchRow['start_date'];
+        $end_date = $batchRow['end_date'];
+    } else {
+        $batch_no = "Not Assigned";
+        $start_date = "0000-00-00";
+        $end_date = "0000-00-00";
+    }
+
     // Insert data into the selected track's table
-    $sql = "INSERT INTO $track (id, name, gender, phone, college, qualification, referral) 
-            VALUES ('$newId', '$name', '$gender', '$phone', '$college', '$qualification', '$referral')";
+    $sql = "INSERT INTO $track (id, name, gender, phone, college, qualification, referral, batch, start_date, end_date) 
+            VALUES ('$newId', '$name', '$gender', '$phone', '$college', '$qualification', '$referral', '$batch_no', '$start_date', '$end_date')";
 
     if ($conn->query($sql) === TRUE) {
         echo "<script>alert('Registration successful! Your ID: $newId'); window.location='index.php';</script>";

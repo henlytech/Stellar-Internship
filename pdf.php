@@ -1,5 +1,52 @@
 <?php
+require_once('config.php'); 
 require_once('tcpdf/tcpdf.php');
+
+// Check if 'id' is provided
+if (!isset($_GET['id'])) {
+    die("Error: ID not provided.");
+}
+
+$id = $_GET['id'];
+
+// Fetch user details from `wd` table
+$userQuery = "SELECT name FROM wd WHERE id = ?";
+$stmt = $conn->prepare($userQuery);
+$stmt->bind_param("s", $id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows == 0) {
+    die("Error: No user found with the given ID.");
+}
+
+$user = $result->fetch_assoc();
+$name = $user['name'];
+
+// Fetch the latest batch number
+$batchNoQuery = "SELECT MAX(batch_no) AS latest_batch FROM batch";
+$result = $conn->query($batchNoQuery);
+$batch = $result->fetch_assoc();
+$latest_batch = $batch['latest_batch'];
+
+// Fetch batch details
+$batchQuery = "SELECT start_date, end_date FROM batch WHERE batch_no = ?";
+$stmt = $conn->prepare($batchQuery);
+$stmt->bind_param("i", $latest_batch);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows == 0) {
+    die("Error: No batch data found.");
+}
+
+$batch = $result->fetch_assoc();
+$start_date = $batch['start_date'];
+$end_date = $batch['end_date'];
+
+// Format dates to dd/mm/yyyy
+$start_date = date('d/m/Y', strtotime($start_date));
+$end_date = date('d/m/Y', strtotime($end_date));
 
 // Create new PDF document
 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
@@ -20,12 +67,12 @@ $pdf->SetAutoPageBreak(false, 0);
 // Add a page
 $pdf->AddPage();
 
-// Add Montserrat fonts (Ensure the font files exist in the fonts/ folder)
+// Add Montserrat fonts
 $montserrat = TCPDF_FONTS::addTTFfont('fonts/Montserrat-Regular.ttf', 'TrueTypeUnicode', '', 96);
 $montserrat_bold = TCPDF_FONTS::addTTFfont('fonts/Montserrat-Bold.ttf', 'TrueTypeUnicode', '', 96);
 $pdf->SetFont($montserrat, '', 12);
 
-// Header section with logo and title
+// Header with logo & title
 $header = '
 <table width="100%">
     <tr>
@@ -34,98 +81,80 @@ $header = '
             INTERNSHIP <br>OFFER LETTER
         </td>
     </tr>
-</table>
-';
-
-// Write header
+</table>';
 $pdf->writeHTML($header, true, false, true, false, '');
-
-// Space after header
 $pdf->Ln(10);
 
-$pdf->SetLineWidth(0.2); // Set line thickness
-$pdf->Line(20, $pdf->GetY(), 178, $pdf->GetY()); // Draw line from (X1, Y1) to (X2, Y2)
-$pdf->Ln(5); // Add space after the line
+$pdf->SetLineWidth(0.2);
+$pdf->Line(20, $pdf->GetY(), 178, $pdf->GetY());
+$pdf->Ln(5);
 
-// Space after header
-$pdf->Ln(10);
-
-// Set font to Montserrat-Bold
-$pdf->SetFont($montserrat_bold, '', 12);
-
-// Date and Batch No in the same row
+// Date & Batch No
 $date_section = '
 <table width="100%">
     <tr>
-        <td width="50%"><p>Date: 31-03-2025</p></td>
-        <td width="50%" style="text-align:right;"><p><b>HT-ML00010</b></p></td>
+        <td width="50%"><p style="font-weight:bold;">Date: ' . date('d/m/Y') . '</p></td>
+        <td width="50%" style="text-align:right;"><p style="font-weight:bold;"><b>' . $id . '</b></p></td>
     </tr>
-</table>
-';
-
+</table>';
 $pdf->writeHTML($date_section, true, false, true, false, '');
 
-
 // Recipient
-$recipient = '<p>Dear Sopitha S,</p>';
+$recipient = '<p style="font-weight:bold;">Dear ' . $name . ',</p>';
 $pdf->writeHTML($recipient, true, false, true, false, '');
-
-// Set font back to Montserrat-Medium
-$pdf->SetFont($montserrat, '', 11);
-
 $pdf->Ln(4);
 
-// Body Content with Justified Text
+// Body Content
 $content = '
-<p style="text-align:justify; line-height:1.6;">Congratulations! We are pleased to offer you the position of a <b>Web Developer Intern</b> at <b>Henly Tech</b>. We are confident that this internship will provide you with valuable experience in the field of web development, offering you an opportunity to learn and grow in a professional environment. You are invited to join us for this internship, effective from <b>31-03-2025 to 07-04-2025</b>.</p>
-<p style="text-align:justify; line-height:1.6;">During your internship, you will work closely with our experienced team, gaining practical knowledge of web development technologies, including <b>HTML, CSS, and Bootstrap</b>. You will also be involved in hands-on tasks and projects that will enhance your skills in designing and building responsive web pages.</p>
-<p style="text-align:justify; line-height:1.6;">We are excited to have you on board and look forward to seeing the innovative solutions you will contribute to our projects.</p>
+<p style="text-align:justify; line-height:1.6;">
+Congratulations! We are pleased to offer you the position of a <b>Web Developer Intern</b> at <b>Henly Tech</b>. 
+We are confident that this internship will provide you with valuable experience in the field of web development. 
+You are invited to join us for this internship, effective from <b>' . $start_date . ' to ' . $end_date . '</b>.
+</p>
+<p style="text-align:justify; line-height:1.6;">
+During your internship, you will work closely with our experienced team, gaining practical knowledge of web development technologies, including 
+<b>HTML, CSS, and Bootstrap</b>. You will also be involved in hands-on tasks and projects that will enhance your skills in designing and building responsive web pages.
+</p>
+<p style="text-align:justify; line-height:1.6;">
+We are excited to have you on board and look forward to seeing the innovative solutions you will contribute to our projects.
+</p>
 <p>Welcome to the team!</p>
 <br>
-<p><b>Thank You</b></p>
-';
-// Write body content
+<p><b>Thank You</b></p>';
 $pdf->writeHTML($content, true, false, true, false, '');
-
 $pdf->Ln(6);
 
-// Signature and Google logo in the same row
+// Signature and Google logo
 $signature_section = '
 <table width="100%">
     <tr>
         <td width="50%"><img src="img/sign.png" width="120"></td>
         <td width="50%" style="text-align:right;"><img src="img/google.png" width="80"></td>
     </tr>
-</table>
-';
-
-// Write signature section
+</table>';
 $pdf->writeHTML($signature_section, true, false, true, false, '');
 
 $pdf->SetY($pdf->GetY() - 8);
-// Set font to Montserrat-Bold
 $pdf->SetFont($montserrat_bold, '', 12);
-
-// Name under signature
 $name_section = '<p><b>Ajay K</b></p>';
+$pdf->SetFont($montserrat, '', 11);
+$position_section = '<p>Hiring Manager, Henly Tech</p>';
 $pdf->writeHTML($name_section, true, false, true, false, '');
+$pdf->writeHTML($position_section, true, false, true, false, '');
 
-// Add the image to the top-right corner
-$imagePath = 'img/border.png';  // Path to your image
-$imageWidth = 52;  // Adjust the image width
-$imageHeight = 250; // Adjust the image height
-$pdf->Image($imagePath, 158, 0, $imageWidth, $imageHeight, 'PNG');
+// Border Image
+$pdf->Image('img/border.png', 158, 0, 52, 250, 'PNG');
 
-// Set absolute footer
+// Footer
 $footerText = "+91 94862 80683 | info.henlytech@gmail.com | Gorimedu, Puducherry, India";
-// Set absolute footer with full width
-$pdf->SetY(265); // Move to the bottom of the page
-$pdf->SetX(0); // Set X position to start from the left edge
-$pdf->SetFillColor(89, 6, 150); // Set background color to #590696
-$pdf->SetTextColor(255, 255, 255); // Set text color to white
+$pdf->SetY(265);
+$pdf->SetX(0);
+$pdf->SetFillColor(89, 6, 150);
+$pdf->SetTextColor(255, 255, 255);
 $pdf->SetFont($montserrat, '', 10);
-$pdf->Cell(210, 35, $footerText, 0, 1, 'C', 1); // Full-width footer (A4 width is 210mm)
+$pdf->Cell(210, 35, $footerText, 0, 1, 'C', 1);
 
-// Display the PDF in the browser (instead of downloading)
+// Output the PDF
 $pdf->Output('Internship_Offer_Letter.pdf', 'I');
+
 ?>

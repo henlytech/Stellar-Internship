@@ -9,6 +9,20 @@ include 'php/index.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration Form</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        #collegeSuggestions {
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            position: absolute;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        #collegeSuggestions li {
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
@@ -48,7 +62,8 @@ include 'php/index.php';
 
                     <div class="mb-3">
                         <label for="college" class="form-label">College</label>
-                        <input type="text" name="college" class="form-control" required>
+                        <input type="text" name="college" id="college" class="form-control" autocomplete="off" oninput="searchColleges()">
+                        <ul id="collegeSuggestions" class="list-group position-absolute"></ul>
                     </div>
 
                     <div class="mb-3">
@@ -71,6 +86,47 @@ include 'php/index.php';
             </div>
         </div>
     </div>
+
+    <script>
+        function searchColleges() {
+            const input = document.getElementById('college').value;
+            const suggestionBox = document.getElementById('collegeSuggestions');
+            
+            if (input.length > 0) {
+                suggestionBox.style.display = 'block';
+                
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', 'search_colleges.php?q=' + encodeURIComponent(input), true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        const colleges = JSON.parse(xhr.responseText);
+                        suggestionBox.innerHTML = '';
+                        
+                        if (colleges.length > 0) {
+                            colleges.forEach(college => {
+                                const li = document.createElement('li');
+                                li.classList.add('list-group-item');
+                                li.textContent = college;
+                                li.onclick = function() {
+                                    document.getElementById('college').value = college;
+                                    suggestionBox.style.display = 'none';
+                                };
+                                suggestionBox.appendChild(li);
+                            });
+                        } else {
+                            const li = document.createElement('li');
+                            li.classList.add('list-group-item');
+                            li.textContent = 'No colleges found';
+                            suggestionBox.appendChild(li);
+                        }
+                    }
+                };
+                xhr.send();
+            } else {
+                suggestionBox.style.display = 'none';
+            }
+        }
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
