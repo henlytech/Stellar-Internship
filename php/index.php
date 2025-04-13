@@ -52,7 +52,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         VALUES ('$newId', '$name', '$gender', '$phone', '$email', '$college', '$qualification', '$referral', '$batch_no', '$start_date', '$end_date')";
 
     if ($conn->query($sql) === TRUE) {
-        echo "<script>alert('Registration successful! Your ID: $newId'); window.location='index.php';</script>";
+        $_SESSION['custom_id'] = $newId;
+        $_SESSION['name'] = $name;
+        // Redirect after processing the form, ensuring no HTML is outputted before this.
+        header("Location: animation.php");
+        exit();
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
