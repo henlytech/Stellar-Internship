@@ -1,6 +1,7 @@
 http://localhost/stellar/pdf.php?id=HT-WD00201
 
-http://localhost/stellar/ml_pdf.php?id=HT-ML00203
+http://localhost/stellar/wd_pdf.php?id=HT-WD00203
 
+http://localhost/stellar/ml_pdf.php?id=HT-ML00203
 
 http://localhost/stellar/dl_pdf.php?id=HT-DL00203

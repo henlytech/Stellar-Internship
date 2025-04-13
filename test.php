@@ -99,6 +99,17 @@ foreach ($tracks as $t) {
 
                         while ($row = $result->fetch_assoc()) {
                             $id = htmlspecialchars($row['id']);
+                            $pdfLink = '';
+                        
+                            // Determine PDF link based on selected track
+                            if ($track == 'WD') {
+                                $pdfLink = "http://localhost/stellar/wd_pdf.php?id=$id";
+                            } elseif ($track == 'ML') {
+                                $pdfLink = "http://localhost/stellar/ml_pdf.php?id=$id";
+                            } elseif ($track == 'DL') {
+                                $pdfLink = "http://localhost/stellar/dl_pdf.php?id=$id";
+                            }
+                        
                             echo "<tr>
                                     <td>{$row['id']}</td>
                                     <td>{$row['name']}</td>
@@ -106,12 +117,13 @@ foreach ($tracks as $t) {
                                     <td>{$row['phone']}</td>
                                     <td>{$row['college']}</td>
                                     <td>
-                                        <a href='http://localhost/stellar/wd_pdf.php?id=$id' class='btn btn-sm btn-success' target='_blank'>
+                                        <a href='$pdfLink' class='btn btn-sm btn-success' target='_blank'>
                                             Letter
                                         </a>
                                     </td>
                                 </tr>";
                         }
+                                
                         echo "</tbody></table></div>";
                     } else {
                         echo "<div class='alert alert-warning mt-3'>No records found for the selected batch.</div>";
