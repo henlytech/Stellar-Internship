@@ -19,7 +19,7 @@
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="batch.php">Batch</a></li>
             <li><a class="dropdown-item" href="tracks.php">Tracks</a></li>
-            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="404.php">404</a></li>
             <li><a class="dropdown-item" href="#">Something else here</a></li>
           </ul>
         </li>
