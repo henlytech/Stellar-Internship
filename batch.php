@@ -1,6 +1,7 @@
 <?php
 include 'config.php';
 include 'php/batch.php'; 
+include 'navbar.php';
 ?>
 
 <!DOCTYPE html>
@@ -13,7 +14,7 @@ include 'php/batch.php';
 </head>
 <body class="bg-light">
 
-<div class="container mt-5">
+<div class="container mt-5 pt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card shadow-lg">

@@ -4,3 +4,6 @@
     --bacground: #ffedb5;
     --gradient-bg: radial-gradient(circle, rgba(89,6,150,1) 21%, rgba(140,82,255,1) 76%);
 }
+.tope {
+    margin-top: 50px;
+}

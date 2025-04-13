@@ -1,6 +1,7 @@
 <?php
 include 'config.php';
 include 'php/index.php';
+include 'navbar.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,7 +26,7 @@ include 'php/index.php';
     </style>
 </head>
 <body>
-    <div class="container mt-5">
+    <div class="container mt-5 pt-4">
         <div class="card shadow">
             <div class="card-header bg-primary text-white">
                 <h3 class="text-center">Registration Form</h3>
@@ -44,6 +45,11 @@ include 'php/index.php';
                             <option value="Female">Female</option>
                             <option value="Other">Other</option>
                         </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" required>
                     </div>
 
                     <div class="mb-3">

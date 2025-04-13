@@ -3,6 +3,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $gender = $_POST['gender'];
     $phone = $_POST['phone'];
+    $email = $_POST['email'];
     $track = $_POST['track']; // Determines the table
     $college = $_POST['college'];
     $qualification = $_POST['qualification'];
@@ -47,8 +48,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Insert data into the selected track's table
-    $sql = "INSERT INTO $track (id, name, gender, phone, college, qualification, referral, batch, start_date, end_date) 
-            VALUES ('$newId', '$name', '$gender', '$phone', '$college', '$qualification', '$referral', '$batch_no', '$start_date', '$end_date')";
+    $sql = "INSERT INTO $track (id, name, gender, phone, email, college, qualification, referral, batch, start_date, end_date) 
+        VALUES ('$newId', '$name', '$gender', '$phone', '$email', '$college', '$qualification', '$referral', '$batch_no', '$start_date', '$end_date')";
 
     if ($conn->query($sql) === TRUE) {
         echo "<script>alert('Registration successful! Your ID: $newId'); window.location='index.php';</script>";
